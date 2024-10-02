@@ -14,15 +14,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Log in to Azure Container Registry (ACR)
+      # Step 2: Log in to Azure via CLI (required to interact with AKS)
+      - name: Log in to Azure
+        run: |
+          az login --service-principal \
+            -u ${{ secrets.AZURE_CLIENT_ID }} \
+            -p ${{ secrets.AZURE_CLIENT_SECRET }} \
+            --tenant ${{ secrets.AZURE_TENANT_ID }}
+      
+      # Step 3: Log in to Azure Container Registry (ACR)
       - name: Log in to ACR
         uses: azure/docker-login@v1
         with:
           login-server: eisenlaiacr.azurecr.io
-          username: eisenlaiacr
-          password: zndW/WmabprJq9nLmWKDh4OF6afTLRJ8lOoEYG+CjB+ACRAUAyFv
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
-      # Step 3: Build and push Docker images to ACR
+      # Step 4: Build and push Docker images to ACR
       - name: Build and push book_catalog image
         run: |
           docker build -t eisenlaiacr.azurecr.io/book_catalog:latest ./book_catalog
@@ -33,16 +41,18 @@ jobs:
           docker build -t eisenlaiacr.azurecr.io/inventory_management:latest ./inventory_management
           docker push eisenlaiacr.azurecr.io/inventory_management:latest
 
-      # Step 4: Set up Kubernetes credentials
+      # Step 5: Set up Kubernetes credentials
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
         with:
           version: v1.21.0
 
+      # Step 6: Get AKS credentials (ensure Azure CLI login step is before this)
       - name: Get AKS credentials
-        run: az aks get-credentials --resource-group sit722_part5_rg --name sit722_part5_aks
+        run: |
+          az aks get-credentials --resource-group sit722_part5_rg --name sit722_part5_aks
 
-      # Step 5: Deploy to Kubernetes
+      # Step 7: Deploy to Kubernetes
       - name: Deploy book_catalog and inventory_management
         run: |
           kubectl apply -f ./scripts/kubernetes/book-catalog_deployment.yaml
