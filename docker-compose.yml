@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  book_catalog:
+    build: ./book_catalog
+    platform: linux/amd64
+    container_name: book_catalog
+    environment:
+      DATABASE_URL: "postgresql://sit722_part5_shku_user:Ya6yGolmeGYRNJkpQyoMgxC4VdixGTcj@dpg-cru95olumphs73ejn7a0-a.oregon-postgres.render.com/sit722_part5_shku"
+
+  inventory_management:
+    build: ./inventory_management
+    platform: linux/amd64
+    container_name: inventory_management
+    environment:
+      DATABASE_URL: "postgresql://sit722_part5_shku_user:Ya6yGolmeGYRNJkpQyoMgxC4VdixGTcj@dpg-cru95olumphs73ejn7a0-a.oregon-postgres.render.com/sit722_part5_shku"
