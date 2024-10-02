@@ -18,7 +18,9 @@ jobs:
       - name: Log in to ACR
         uses: azure/docker-login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          login-server: eisenlaiacr.azurecr.io
+          username: eisenlaiacr
+          password: zndW/WmabprJq9nLmWKDh4OF6afTLRJ8lOoEYG+CjB+ACRAUAyFv
 
       # Step 3: Build and push Docker images to ACR
       - name: Build and push book_catalog image
