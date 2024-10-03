@@ -14,13 +14,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Log in to Azure via CLI (required to interact with AKS)
-      - name: Log in to Azure
-        run: az login --service-principal \
-        --username ${{ secrets.AZURE_CLIENT_ID }} \
-        --password ${{ secrets.AZURE_CLIENT_SECRET }} \
-        --tenant ${{ secrets.AZURE_TENANT_ID }}
-      
+      # Step 2: Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
       # Step 3: Log in to Azure Container Registry (ACR)
       - name: Log in to ACR
         uses: azure/docker-login@v1
@@ -46,13 +43,21 @@ jobs:
         with:
           version: v1.21.0
 
-      # Step 6: Get AKS credentials (ensure Azure CLI login step is before this)
       - name: Get AKS credentials
-        run: |
-          az aks get-credentials --resource-group sit722_part5_rg --name sit722_part5_aks
+        run: az aks get-credentials --resource-group sit722_part5_rg --name sit722_part5_aks
 
-      # Step 7: Deploy to Kubernetes
+      - name: Verify Kubernetes context
+        run: kubectl config current-context
+
+      # Step 6: Deploy to Kubernetes
       - name: Deploy book_catalog and inventory_management
         run: |
           kubectl apply -f ./scripts/kubernetes/book-catalog_deployment.yaml
           kubectl apply -f ./scripts/kubernetes/inventory_management_deployment.yaml
+
+      # Step 7: Check Deployment Status
+      - name: Check Deployment Status
+        run: |
+          kubectl rollout status deployment/book-catalog
+          kubectl rollout status deployment/inventory-management
+
