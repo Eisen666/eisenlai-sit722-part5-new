@@ -24,15 +24,14 @@ jobs:
 
       # Step 4: Build and push Docker images to ACR
       - name: Build and push book_catalog image
-         run: |
-           docker build -t eisenlaiacr.azurecr.io/book_catalog:latest ./book_catalog
-           docker push eisenlaiacr.azurecr.io/book_catalog:latest
+        run: |
+          docker build -t eisenlaiacr.azurecr.io/book_catalog:latest ./book_catalog
+          docker push eisenlaiacr.azurecr.io/book_catalog:latest
 
       - name: Build and push inventory_management image
-         run: |
-           docker build -t eisenlaiacr.azurecr.io/inventory_management:latest ./inventory_management
-           docker push eisenlaiacr.azurecr.io/inventory_management:latest
-
+        run: |
+          docker build -t eisenlaiacr.azurecr.io/inventory_management:latest ./inventory_management
+          docker push eisenlaiacr.azurecr.io/inventory_management:latest
 
       # Step 5: Set up Kubernetes credentials
       - name: Set up kubectl
@@ -57,4 +56,3 @@ jobs:
         run: |
           kubectl rollout status deployment/book-catalog
           kubectl rollout status deployment/inventory-management
-
